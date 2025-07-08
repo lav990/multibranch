@@ -40,6 +40,7 @@ pipeline {
                     else
                         echo "App is not running."
                     fi
+                    cd target
                     JENKINS_NODE_COOKIE=dontKillMe nohup java -jar java-sample-21-1.0.0.jar > app.log 2>&1 &
                 '''
             }
