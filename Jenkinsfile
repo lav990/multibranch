@@ -23,6 +23,20 @@ pipeline {
             }
         }
 
+        stage('Sonar Analysis') {
+                steps {
+                    dir('javaapp-pipeline') {
+                        withSonarQubeEnv('sonar') {
+                            sh '''
+                                mvn verify sonar:sonar \
+                                -Dsonar.projectKey=java-app \
+                                -Dsonar.projectName=java-app
+                            '''
+                        }
+                    }
+                }
+            }
+
         stage ('build') {
             when {branch 'main'}
             steps {
@@ -31,7 +45,6 @@ pipeline {
         }
 
         stage ('deploy') {
-            when {branch 'main'}
             steps {
                 sh '''
                     if pgrep -f "java -jar java-sample-21-1.0.0.jar" > /dev/null; then
@@ -44,6 +57,18 @@ pipeline {
                     JENKINS_NODE_COOKIE=dontKillMe nohup java -jar java-sample-21-1.0.0.jar > app.log 2>&1 &
                 '''
             }
+        }
+    }
+
+    post {
+        aborted {
+            echo 'Pipeline was aborted.'
+        }
+        success {
+            echo 'Deployment completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs.'
         }
     }
 }
