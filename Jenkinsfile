@@ -61,14 +61,16 @@ pipeline {
     }
 
     post {
-        aborted {
-            echo 'Pipeline was aborted.'
+        always {
+            echo 'Pipeline completed!'
+            cleanWs()  
         }
         success {
-            echo 'Deployment completed successfully!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed. Check logs.'
+            echo 'Pipeline failed! Check logs.'
+            emailtext body: 'Build failed', subject: 'Build Failure', to: 'lavanya@gmail.com'
         }
     }
 }
